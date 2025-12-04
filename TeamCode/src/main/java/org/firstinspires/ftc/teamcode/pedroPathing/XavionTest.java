@@ -31,10 +31,10 @@ public class XavionTest extends OpMode {
     private int pathState;
     private java.util.List<Pose> allPoses;
 
-    private Pose startPose, endPose;
+    private Pose startPose, endPose, turnPose;
 
     private Path movement;
-    private PathChain goToFinish1, goToFinish2, goToFinish3, grabPickup1, grabPickup2, grabPickup3;
+    private PathChain turnPath, goToFinish1, goToFinish2, goToFinish3, grabPickup1, grabPickup2, grabPickup3;
 
     private int blueOrRedX = 0;
     private int blueOrRedHeading = 0;
@@ -65,6 +65,8 @@ public class XavionTest extends OpMode {
 
         startPose = new Pose(Math.abs(blueOrRedX-72), 9, Math.toRadians(Math.abs(blueOrRedHeading-90)));
         endPose = new Pose(Math.abs(blueOrRedX-72), 72, Math.toRadians(Math.abs(blueOrRedHeading-0)));
+        turnPose = new Pose(Math.abs(blueOrRedX-90), 90, Math.toRadians(Math.abs(blueOrRedHeading-90)));
+
 
 
         follower = Constants.createFollower(hardwareMap);
@@ -90,12 +92,10 @@ public class XavionTest extends OpMode {
 
         /* This is our scorePreload path. We are using a BezierLine, which is a straight line. */
         movement = new Path(new BezierLine(startPose, endPose));
-//        movement.setLinearHeadingInterpolation(startPose.getHeading(), endPose.getHeading());
-
-//        grabPickup1 = follower.pathBuilder()
-//                .addPath(new BezierCurve(scorePose, new Pose(Math.abs(blueOrRedX-80), 40, Math.toRadians(Math.abs(blueOrRedHeading-0))), pickup1Pose))
-//                .setLinearHeadingInterpolation(scorePose.getHeading(), pickup1Pose.getHeading())
-//                .build();
+        turnPath = follower.pathBuilder()
+                .addPath(new BezierCurve(endPose, new Pose(Math.abs(blueOrRedX-80), 40, Math.toRadians(Math.abs(blueOrRedHeading-0))), turnPose))
+                .setLinearHeadingInterpolation(endPose.getHeading(), turnPose.getHeading())
+                .build();
 
 
 
@@ -115,9 +115,12 @@ public class XavionTest extends OpMode {
     public void autonomousPathUpdate() {
         switch (pathState) {
             case 0:
-                setPowers(1.0);
+//                setPowers(1.0);
                 follower.followPath(movement);
                 setPathState(1);
+                break;
+            case 1:
+                follower.followPath(turnPath);
                 break;
 
         }
