@@ -8,14 +8,13 @@ import com.pedropathing.paths.Path;
 import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import  com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.Servo;
 
-@Autonomous(name = "Autonomous2025")
-public class Autonomous2025 extends OpMode {
+@Autonomous(name = "AllianceAutonomous2025")
+public class AllianceAutonomous2025 extends OpMode {
 
     private Follower follower;
     private Timer pathTimer, actionTimer, opmodeTimer;
@@ -47,12 +46,12 @@ public class Autonomous2025 extends OpMode {
         scorePreload.setLinearHeadingInterpolation(startPose.getHeading(), scorePose.getHeading());
 
         grabPickup1 = follower.pathBuilder()
-                .addPath(new BezierCurve(scorePose, new Pose(Math.abs(blueOrRedX-80), 40, Math.toRadians(Math.abs(blueOrRedHeading-0))), pickup1Pose))
+                .addPath(new BezierCurve(scorePose, new Pose(Math.abs(blueOrRedX-70), 40, Math.toRadians(Math.abs(blueOrRedHeading-0))), pickup1Pose))
                 .setLinearHeadingInterpolation(scorePose.getHeading(), pickup1Pose.getHeading())
                 .build();
 
         grabPickup2 = follower.pathBuilder()
-                .addPath(new BezierCurve(finishPose, new Pose(Math.abs(blueOrRedX-70), 72, Math.toRadians(Math.abs(blueOrRedHeading-0))),pickup2Pose))
+                .addPath(new BezierCurve(finishPose, new Pose(Math.abs(blueOrRedX-70), 75, Math.toRadians(Math.abs(blueOrRedHeading-0))),pickup2Pose))
                 .setLinearHeadingInterpolation(finishPose.getHeading(), pickup2Pose.getHeading())
                 .build();
 
@@ -82,8 +81,8 @@ public class Autonomous2025 extends OpMode {
 
     }
     public void setPowers(double power) {
-        ((DcMotorEx) LLaunch).setVelocity(1200 * power);
-        ((DcMotorEx) RLaunch).setVelocity(-1200 * power);
+        ((DcMotorEx) LLaunch).setVelocity(1100 * power);
+        ((DcMotorEx) RLaunch).setVelocity(-1100 * power);
 //        LLaunch.setPower(0.56 * power);
 //        RLaunch.setPower(-0.56 * power);
         LFeed.setPower(-1 * power);
@@ -92,12 +91,14 @@ public class Autonomous2025 extends OpMode {
     public void autonomousPathUpdate() {
         switch (pathState) {
             case 0:
-                setPowers(1.0);
                 follower.followPath(scorePreload);
                 setPathState(1);
                 break;
             case 1:
-                if(pathTimer.getElapsedTimeSeconds() > 6) {
+                if(pathTimer.getElapsedTimeSeconds() > 1.5){
+                    setPowers(1.0);
+                }
+                if(pathTimer.getElapsedTimeSeconds() > 8) {
                     setPowers(0.0);
                     follower.followPath(grabPickup1,true);
                     setPathState(2);
@@ -201,7 +202,6 @@ public class Autonomous2025 extends OpMode {
                 blueOrRed = "red";
                 blueOrRedX = 144;
                 blueOrRedHeading = 180;
-
             }
         }
         telemetry.addData("Current Selection (press left bumper)", blueOrRed);
@@ -216,10 +216,12 @@ public class Autonomous2025 extends OpMode {
      **/
     @Override
     public void start() {
-//        startPose = new Pose(Math.abs(blueOrRedX-91), 9, Math.toRadians(Math.abs(blueOrRedHeading-90))); // Start Pose of our robot.
+//
 
-        startPose = new Pose(Math.abs(blueOrRedX-53), 9, Math.toRadians(Math.abs(blueOrRedHeading-90)));
-        scorePose = new Pose(Math.abs(blueOrRedX-89), 10, Math.toRadians(Math.abs(blueOrRedHeading-120))); // Scoring Pose of our robot. It is facing the goal at a 135 degree angle.
+//        startPose = new Pose(Math.abs(blueOrRedX-53), 9, Math.toRadians(Math.abs(blueOrRedHeading-90)));
+        startPose = new Pose(Math.abs(blueOrRedX-23), 124, Math.toRadians(Math.abs(blueOrRedHeading-315)));
+
+        scorePose = new Pose(Math.abs(blueOrRedX-110), 101, Math.toRadians(Math.abs(blueOrRedHeading-158))); // Scoring Pose of our robot. It is facing the goal at a 135 degree angle.
 
         pickup1Pose = new Pose(Math.abs(blueOrRedX-120), 48, Math.toRadians(Math.abs(blueOrRedHeading-0))); // Lowest (Third Set) of Artifacts from the Spike Mark.
 
