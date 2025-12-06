@@ -8,11 +8,10 @@ import com.pedropathing.paths.Path;
 import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import  com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.Servo;
 
 @Autonomous(name = "Autonomous2025")
 public class Autonomous2025 extends OpMode {
@@ -32,32 +31,39 @@ public class Autonomous2025 extends OpMode {
     private int pathState;
     private java.util.List<Pose> allPoses;
 
-    private Pose startPose,scorePose,pickup1Pose,pickup2Pose,pickup3Pose,finishPose;
+    private Pose startPose, scorePose, pickup1Pose, pickup2Pose, pickup3Pose, finishPose;
 
     private Path scorePreload;
-    private PathChain goToFinish1,goToFinish2,goToFinish3,grabPickup1,grabPickup2,grabPickup3;
+    private PathChain goToFinish1, goToFinish2, goToFinish3, grabPickup1, grabPickup2, grabPickup3;
 
     private int blueOrRedX = 0;
     private int blueOrRedHeading = 0;
+    private boolean alliance = false;
     private String blueOrRed = "blue";
 
     public void buildPaths() {
         /* This is our scorePreload path. We are using a BezierLine, which is a straight line. */
         scorePreload = new Path(new BezierLine(startPose, scorePose));
         scorePreload.setLinearHeadingInterpolation(startPose.getHeading(), scorePose.getHeading());
+        if (!alliance) {
+            grabPickup1 = follower.pathBuilder()
+                    .addPath(new BezierCurve(scorePose, new Pose(Math.abs(blueOrRedX - 70), 40, Math.toRadians(Math.abs(blueOrRedHeading - 0))), pickup1Pose))
+                    .setLinearHeadingInterpolation(scorePose.getHeading(), pickup1Pose.getHeading())
+                    .build();
 
-        grabPickup1 = follower.pathBuilder()
-                .addPath(new BezierCurve(scorePose, new Pose(Math.abs(blueOrRedX-80), 40, Math.toRadians(Math.abs(blueOrRedHeading-0))), pickup1Pose))
-                .setLinearHeadingInterpolation(scorePose.getHeading(), pickup1Pose.getHeading())
-                .build();
-
+        } else {
+            grabPickup1 = follower.pathBuilder()
+                    .addPath(new BezierCurve(scorePose, new Pose(Math.abs(blueOrRedX - 80), 40, Math.toRadians(Math.abs(blueOrRedHeading - 0))), pickup1Pose))
+                    .setLinearHeadingInterpolation(scorePose.getHeading(), pickup1Pose.getHeading())
+                    .build();
+        }
         grabPickup2 = follower.pathBuilder()
-                .addPath(new BezierCurve(finishPose, new Pose(Math.abs(blueOrRedX-70), 72, Math.toRadians(Math.abs(blueOrRedHeading-0))),pickup2Pose))
+                .addPath(new BezierCurve(finishPose, new Pose(Math.abs(blueOrRedX - 70), 72, Math.toRadians(Math.abs(blueOrRedHeading - 0))), pickup2Pose))
                 .setLinearHeadingInterpolation(finishPose.getHeading(), pickup2Pose.getHeading())
                 .build();
 
         grabPickup3 = follower.pathBuilder()
-                .addPath(new BezierCurve(finishPose, new Pose(Math.abs(blueOrRedX-70), 98, Math.toRadians(Math.abs(blueOrRedHeading-0))),pickup3Pose))
+                .addPath(new BezierCurve(finishPose, new Pose(Math.abs(blueOrRedX - 70), 98, Math.toRadians(Math.abs(blueOrRedHeading - 0))), pickup3Pose))
                 .setLinearHeadingInterpolation(finishPose.getHeading(), pickup3Pose.getHeading())
                 .build();
 
@@ -81,57 +87,74 @@ public class Autonomous2025 extends OpMode {
 
 
     }
+
     public void setPowers(double power) {
-        ((DcMotorEx) LLaunch).setVelocity(1200 * power);
-        ((DcMotorEx) RLaunch).setVelocity(-1200 * power);
-//        LLaunch.setPower(0.56 * power);
-//        RLaunch.setPower(-0.56 * power);
+        if (alliance) {
+            ((DcMotorEx) LLaunch).setVelocity(1100 * power);
+            ((DcMotorEx) RLaunch).setVelocity(-1100 * power);
+        } else {
+            ((DcMotorEx) LLaunch).setVelocity(1200 * power);
+            ((DcMotorEx) RLaunch).setVelocity(-1200 * power);
+        }
         LFeed.setPower(-1 * power);
         RFeed.setPower(1 * power);
     }
+
     public void autonomousPathUpdate() {
         switch (pathState) {
             case 0:
-                setPowers(1.0);
+                if (!alliance) {
+                    setPowers(1.0);
+                }
                 follower.followPath(scorePreload);
                 setPathState(1);
                 break;
             case 1:
-                if(pathTimer.getElapsedTimeSeconds() > 6) {
-                    setPowers(0.0);
-                    follower.followPath(grabPickup1,true);
-                    setPathState(2);
-
+                if (alliance) {
+                    if (pathTimer.getElapsedTimeSeconds() > 1.5) {
+                        setPowers(1.0);
+                    }
+                    if (pathTimer.getElapsedTimeSeconds() > 8) {
+                        setPowers(0.0);
+                        follower.followPath(grabPickup1, true);
+                        setPathState(2);
+                    }
+                } else {
+                    if (pathTimer.getElapsedTimeSeconds() > 6) {
+                        setPowers(0.0);
+                        follower.followPath(grabPickup1, true);
+                        setPathState(2);
+                    }
                 }
                 break;
 
             case 2:
-                if(!follower.isBusy()) {
-                    follower.followPath(goToFinish1,true);
+                if (!follower.isBusy()) {
+                    follower.followPath(goToFinish1, true);
                     setPathState(3);
                 }
                 break;
             case 3:
-                if(!follower.isBusy()) {
-                    follower.followPath(grabPickup2,true);
+                if (!follower.isBusy()) {
+                    follower.followPath(grabPickup2, true);
                     setPathState(4);
                 }
                 break;
             case 4:
-                if(!follower.isBusy()) {
-                    follower.followPath(goToFinish2,true);
+                if (!follower.isBusy()) {
+                    follower.followPath(goToFinish2, true);
                     setPathState(5);
                 }
                 break;
             case 5:
-                if(!follower.isBusy()) {
-                    follower.followPath(grabPickup3,true);
+                if (!follower.isBusy()) {
+                    follower.followPath(grabPickup3, true);
                     setPathState(6);
                 }
                 break;
             case 6:
-                if(!follower.isBusy()) {
-                    follower.followPath(goToFinish3,true);
+                if (!follower.isBusy()) {
+                    follower.followPath(goToFinish3, true);
                     setPathState(-1);
                 }
                 break;
@@ -184,7 +207,6 @@ public class Autonomous2025 extends OpMode {
         RLaunch.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
 
-
     }
 
     /**
@@ -192,18 +214,24 @@ public class Autonomous2025 extends OpMode {
      **/
     @Override
     public void init_loop() {
-        if (gamepad1.left_bumper){
-            if (blueOrRed.equals("red")){
+        if (gamepad1.left_bumper) {
+            if (blueOrRed.equals("red")) {
                 blueOrRed = "blue";
                 blueOrRedX = 0;
                 blueOrRedHeading = 0;
-            } else if (blueOrRed.equals("blue")){
+            } else if (blueOrRed.equals("blue")) {
                 blueOrRed = "red";
                 blueOrRedX = 144;
                 blueOrRedHeading = 180;
 
             }
         }
+
+        if (gamepad1.right_bumper) {
+            alliance = !alliance;
+        }
+
+        telemetry.addData("Alliance (press right bumper)", alliance);
         telemetry.addData("Current Selection (press left bumper)", blueOrRed);
         telemetry.addData("Current X offset", blueOrRedX);
         telemetry.addData("Current heading offset", blueOrRedHeading);
@@ -216,16 +244,18 @@ public class Autonomous2025 extends OpMode {
      **/
     @Override
     public void start() {
-//        startPose = new Pose(Math.abs(blueOrRedX-91), 9, Math.toRadians(Math.abs(blueOrRedHeading-90))); // Start Pose of our robot.
+        if (alliance) {
+            startPose = new Pose(Math.abs(blueOrRedX - 23), 124, Math.toRadians(Math.abs(blueOrRedHeading - 315)));
+            scorePose = new Pose(Math.abs(blueOrRedX - 110), 101, Math.toRadians(Math.abs(blueOrRedHeading - 158))); // Scoring Pose of our robot. It is facing the goal at a 158 degree angle.
+        } else {
+            startPose = new Pose(Math.abs(blueOrRedX - 53), 9, Math.toRadians(Math.abs(blueOrRedHeading - 90)));
+            scorePose = new Pose(Math.abs(blueOrRedX - 89), 10, Math.toRadians(Math.abs(blueOrRedHeading - 120))); // Scoring Pose of our robot. It is facing the goal at a 135 degree angle.
+        }
+        pickup1Pose = new Pose(Math.abs(blueOrRedX - 120), 48, Math.toRadians(Math.abs(blueOrRedHeading - 0))); // Lowest (Third Set) of Artifacts from the Spike Mark.
 
-        startPose = new Pose(Math.abs(blueOrRedX-53), 9, Math.toRadians(Math.abs(blueOrRedHeading-90)));
-        scorePose = new Pose(Math.abs(blueOrRedX-89), 10, Math.toRadians(Math.abs(blueOrRedHeading-120))); // Scoring Pose of our robot. It is facing the goal at a 135 degree angle.
-
-        pickup1Pose = new Pose(Math.abs(blueOrRedX-120), 48, Math.toRadians(Math.abs(blueOrRedHeading-0))); // Lowest (Third Set) of Artifacts from the Spike Mark.
-
-        pickup2Pose = new Pose(Math.abs(blueOrRedX-120), 72, Math.toRadians(Math.abs(blueOrRedHeading-0))); // Middle (Second Set) of Artifacts from the Spike Mark.
-        pickup3Pose = new Pose(Math.abs(blueOrRedX-120), 96, Math.toRadians(Math.abs(blueOrRedHeading-0))); // Highest (First Set) of Artifacts from the Spike Mark.
-        finishPose = new Pose(Math.abs(blueOrRedX-125), 14, Math.toRadians(Math.abs(blueOrRedHeading-0)));
+        pickup2Pose = new Pose(Math.abs(blueOrRedX - 120), 72, Math.toRadians(Math.abs(blueOrRedHeading - 0))); // Middle (Second Set) of Artifacts from the Spike Mark.
+        pickup3Pose = new Pose(Math.abs(blueOrRedX - 120), 96, Math.toRadians(Math.abs(blueOrRedHeading - 0))); // Highest (First Set) of Artifacts from the Spike Mark.
+        finishPose = new Pose(Math.abs(blueOrRedX - 125), 14, Math.toRadians(Math.abs(blueOrRedHeading - 0)));
 
 
         follower = Constants.createFollower(hardwareMap);
@@ -243,7 +273,7 @@ public class Autonomous2025 extends OpMode {
     public void stop() {
         if (LLaunch != null) LLaunch.setPower(0.0);
         if (RLaunch != null) RLaunch.setPower(0.0);
-        if (LFeed != null)  LFeed.setPower(0.0);
-        if (RFeed != null)  RFeed.setPower(0.0);
+        if (LFeed != null) LFeed.setPower(0.0);
+        if (RFeed != null) RFeed.setPower(0.0);
     }
 }

@@ -51,7 +51,7 @@ public class AllianceAutonomous2025 extends OpMode {
                 .build();
 
         grabPickup2 = follower.pathBuilder()
-                .addPath(new BezierCurve(finishPose, new Pose(Math.abs(blueOrRedX-70), 75, Math.toRadians(Math.abs(blueOrRedHeading-0))),pickup2Pose))
+                .addPath(new BezierCurve(finishPose, new Pose(Math.abs(blueOrRedX-70), 72, Math.toRadians(Math.abs(blueOrRedHeading-0))),pickup2Pose))
                 .setLinearHeadingInterpolation(finishPose.getHeading(), pickup2Pose.getHeading())
                 .build();
 
@@ -216,11 +216,7 @@ public class AllianceAutonomous2025 extends OpMode {
      **/
     @Override
     public void start() {
-//
-
-//        startPose = new Pose(Math.abs(blueOrRedX-53), 9, Math.toRadians(Math.abs(blueOrRedHeading-90)));
         startPose = new Pose(Math.abs(blueOrRedX-23), 124, Math.toRadians(Math.abs(blueOrRedHeading-315)));
-
         scorePose = new Pose(Math.abs(blueOrRedX-110), 101, Math.toRadians(Math.abs(blueOrRedHeading-158))); // Scoring Pose of our robot. It is facing the goal at a 135 degree angle.
 
         pickup1Pose = new Pose(Math.abs(blueOrRedX-120), 48, Math.toRadians(Math.abs(blueOrRedHeading-0))); // Lowest (Third Set) of Artifacts from the Spike Mark.
