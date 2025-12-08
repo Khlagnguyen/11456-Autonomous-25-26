@@ -45,25 +45,16 @@ public class Autonomous2025 extends OpMode {
         /* This is our scorePreload path. We are using a BezierLine, which is a straight line. */
         scorePreload = new Path(new BezierLine(startPose, scorePose));
         scorePreload.setLinearHeadingInterpolation(startPose.getHeading(), scorePose.getHeading());
-        if (!alliance) {
-            grabPickup1 = follower.pathBuilder()
-                    .addPath(new BezierCurve(scorePose, new Pose(Math.abs(blueOrRedX - 70), 40, Math.toRadians(Math.abs(blueOrRedHeading - 0))), pickup1Pose))
-                    .setLinearHeadingInterpolation(scorePose.getHeading(), pickup1Pose.getHeading())
-                    .build();
-
-        } else {
-            grabPickup1 = follower.pathBuilder()
-                    .addPath(new BezierCurve(scorePose, new Pose(Math.abs(blueOrRedX - 80), 40, Math.toRadians(Math.abs(blueOrRedHeading - 0))), pickup1Pose))
-                    .setLinearHeadingInterpolation(scorePose.getHeading(), pickup1Pose.getHeading())
-                    .build();
-        }
+        grabPickup1 = follower.pathBuilder()
+                .addPath(new BezierCurve(scorePose, new Pose(Math.abs(blueOrRedX - 68), 38, Math.toRadians(Math.abs(blueOrRedHeading - 0))), pickup1Pose))
+                .setLinearHeadingInterpolation(scorePose.getHeading(), pickup1Pose.getHeading())
+                .build();
         grabPickup2 = follower.pathBuilder()
-                .addPath(new BezierCurve(finishPose, new Pose(Math.abs(blueOrRedX - 70), 72, Math.toRadians(Math.abs(blueOrRedHeading - 0))), pickup2Pose))
+                .addPath(new BezierCurve(finishPose, new Pose(Math.abs(blueOrRedX - 68), 73, Math.toRadians(Math.abs(blueOrRedHeading - 0))), pickup2Pose))
                 .setLinearHeadingInterpolation(finishPose.getHeading(), pickup2Pose.getHeading())
                 .build();
-
         grabPickup3 = follower.pathBuilder()
-                .addPath(new BezierCurve(finishPose, new Pose(Math.abs(blueOrRedX - 70), 98, Math.toRadians(Math.abs(blueOrRedHeading - 0))), pickup3Pose))
+                .addPath(new BezierCurve(finishPose, new Pose(Math.abs(blueOrRedX - 68), 98, Math.toRadians(Math.abs(blueOrRedHeading - 0))), pickup3Pose))
                 .setLinearHeadingInterpolation(finishPose.getHeading(), pickup3Pose.getHeading())
                 .build();
 
@@ -245,16 +236,20 @@ public class Autonomous2025 extends OpMode {
     @Override
     public void start() {
         if (alliance) {
-            startPose = new Pose(Math.abs(blueOrRedX - 23), 124, Math.toRadians(Math.abs(blueOrRedHeading - 315)));
+            if (blueOrRed.equals("blue")) {
+                startPose = new Pose(23, 124, Math.toRadians(315));
+            }
+            else{
+                startPose = new Pose(121, 126, Math.toRadians(225));
+            }
             scorePose = new Pose(Math.abs(blueOrRedX - 110), 101, Math.toRadians(Math.abs(blueOrRedHeading - 158))); // Scoring Pose of our robot. It is facing the goal at a 158 degree angle.
         } else {
             startPose = new Pose(Math.abs(blueOrRedX - 53), 9, Math.toRadians(Math.abs(blueOrRedHeading - 90)));
             scorePose = new Pose(Math.abs(blueOrRedX - 89), 10, Math.toRadians(Math.abs(blueOrRedHeading - 120))); // Scoring Pose of our robot. It is facing the goal at a 135 degree angle.
         }
         pickup1Pose = new Pose(Math.abs(blueOrRedX - 120), 48, Math.toRadians(Math.abs(blueOrRedHeading - 0))); // Lowest (Third Set) of Artifacts from the Spike Mark.
-
-        pickup2Pose = new Pose(Math.abs(blueOrRedX - 120), 72, Math.toRadians(Math.abs(blueOrRedHeading - 0))); // Middle (Second Set) of Artifacts from the Spike Mark.
-        pickup3Pose = new Pose(Math.abs(blueOrRedX - 120), 96, Math.toRadians(Math.abs(blueOrRedHeading - 0))); // Highest (First Set) of Artifacts from the Spike Mark.
+        pickup2Pose = new Pose(Math.abs(blueOrRedX - 120), 73, Math.toRadians(Math.abs(blueOrRedHeading - 0))); // Middle (Second Set) of Artifacts from the Spike Mark.
+        pickup3Pose = new Pose(Math.abs(blueOrRedX - 120), 98, Math.toRadians(Math.abs(blueOrRedHeading - 0))); // Highest (First Set) of Artifacts from the Spike Mark.
         finishPose = new Pose(Math.abs(blueOrRedX - 125), 14, Math.toRadians(Math.abs(blueOrRedHeading - 0)));
 
 
