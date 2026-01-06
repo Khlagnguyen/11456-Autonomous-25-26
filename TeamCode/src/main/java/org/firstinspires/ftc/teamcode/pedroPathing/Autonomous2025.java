@@ -12,6 +12,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 @Autonomous(name = "Autonomous2025")
 public class Autonomous2025 extends OpMode {
@@ -41,6 +42,9 @@ public class Autonomous2025 extends OpMode {
     private boolean alliance = false;
     private String blueOrRed = "blue";
 
+    private ElapsedTime timer = new ElapsedTime();
+
+    private int state =0;
     public void buildPaths() {
         /* This is our scorePreload path. We are using a BezierLine, which is a straight line. */
         scorePreload = new Path(new BezierLine(startPose, scorePose));
@@ -205,21 +209,29 @@ public class Autonomous2025 extends OpMode {
      **/
     @Override
     public void init_loop() {
-        if (gamepad1.left_bumper) {
-            if (blueOrRed.equals("red")) {
-                blueOrRed = "blue";
-                blueOrRedX = 0;
-                blueOrRedHeading = 0;
-            } else if (blueOrRed.equals("blue")) {
-                blueOrRed = "red";
-                blueOrRedX = 144;
-                blueOrRedHeading = 180;
-
+        switch(state) {
+            case 0:
+            if (gamepad1.left_bumper) {
+                if (blueOrRed.equals("red")) {
+                    blueOrRed = "blue";
+                    blueOrRedX = 0;
+                    blueOrRedHeading = 0;
+                } else if (blueOrRed.equals("blue")) {
+                    blueOrRed = "red";
+                    blueOrRedX = 144;
+                    blueOrRedHeading = 180;
+                }
             }
-        }
-
-        if (gamepad1.right_bumper) {
-            alliance = !alliance;
+            if(gamepad1.right_bumper) {
+                alliance = !alliance;
+            }
+            state = 1;
+            break;
+            case 1:
+                if (timer.milliseconds() >=200){
+                    state = 0;
+                    break;
+                }
         }
 
         telemetry.addData("Alliance (press right bumper)", alliance);
@@ -238,8 +250,7 @@ public class Autonomous2025 extends OpMode {
         if (alliance) {
             if (blueOrRed.equals("blue")) {
                 startPose = new Pose(23, 124, Math.toRadians(315));
-            }
-            else{
+            } else {
                 startPose = new Pose(121, 126, Math.toRadians(225));
             }
             scorePose = new Pose(Math.abs(blueOrRedX - 110), 101, Math.toRadians(Math.abs(blueOrRedHeading - 158))); // Scoring Pose of our robot. It is facing the goal at a 158 degree angle.
