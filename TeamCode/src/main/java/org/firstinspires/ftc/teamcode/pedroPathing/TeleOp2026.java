@@ -257,12 +257,16 @@ public class TeleOp2026 extends LinearOpMode {
     private int calculateAdaptiveVelocity(double range) {
         // y = mx + c formula
         // Slope m = (y2 - y1) / (x2 - x1)
-        double slope = (VELO_FAR - VELO_NEAR) / (DIST_FAR - DIST_NEAR);
-        
-        // y = m * (x - x1) + y1
-        double velocity = slope * (range - DIST_NEAR) + VELO_NEAR;
-        
-        return (int) Range.clip(velocity, 0, 3000); // Safety clip
+        if(range>120) {
+            double slope = (VELO_FAR - VELO_NEAR) / (DIST_FAR - DIST_NEAR);
+
+            // y = m * (x - x1) + y1
+            double velocity = slope * (range - DIST_NEAR) + VELO_NEAR;
+
+            return (int) Range.clip(velocity, 0, 3000); // Safety clip
+        } else{
+            return(1100);
+        }
     }
 
     private boolean isTargetPillar(int id) {
