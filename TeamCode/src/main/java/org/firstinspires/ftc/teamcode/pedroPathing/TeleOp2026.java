@@ -40,7 +40,7 @@ import java.util.List;
  * - Auto (Constants.java) reverses Left motors by default -> CHECK THIS if Auto drives backwards!
  */
 
-@TeleOp(name = "TeleOp 2025")
+@TeleOp(name = "TeleOp 2026")
 public class TeleOp2026 extends LinearOpMode {
 
     // --- HARDWARE ---
@@ -65,10 +65,10 @@ public class TeleOp2026 extends LinearOpMode {
     // Example: At 10 inches away, the motor needs to spin at 1100 ticks/sec.
     //          At 40 inches away, it needs 1300 ticks/sec.
     private static final double DIST_NEAR = 72; // inches
-    private static final double VELO_NEAR = 1050; // velocity ticks/sec
+    private static final double VELO_NEAR = 900; // velocity ticks/sec
     
     private static final double DIST_FAR  = 144.0; // inches
-    private static final double VELO_FAR  = 1250; // velocity ticks/sec
+    private static final double VELO_FAR  = 1200; // velocity ticks/sec
 
     @Override
     public void runOpMode() {
