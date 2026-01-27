@@ -104,7 +104,7 @@ public class Autonomous2026 extends OpMode {
     }
 
     public void setPowers(double power) {
-        if (alliance) {
+        if (alliance || goAlliance) {
             ((DcMotorEx) LLaunch).setVelocity(1100 * power);
             ((DcMotorEx) RLaunch).setVelocity(-1100 * power);
         } else {
@@ -126,7 +126,7 @@ public class Autonomous2026 extends OpMode {
                 break;
             case 1:
                 if (alliance || goAlliance) {
-                    double startTime = goAlliance ? 5.0 : 1.5;
+                    double startTime = goAlliance ? 2.5 : 1.5;
                     if (pathTimer.getElapsedTimeSeconds() > startTime) {
                         setPowers(1.0);
                     }
@@ -284,9 +284,9 @@ public class Autonomous2026 extends OpMode {
         if (alliance || goAlliance) {
             if (alliance) {
                 if (blueOrRed.equals("blue")) {
-                    startPose = new Pose(23, 124, Math.toRadians(315));
+                    startPose = new Pose(23, 125, Math.toRadians(315));
                 } else {
-                    startPose = new Pose(121, 124, Math.toRadians(225));
+                    startPose = new Pose(121, 125, Math.toRadians(225));
                 }
             } else {
                 startPose = new Pose(Math.abs(blueOrRedX - 53), 9, Math.toRadians(Math.abs(blueOrRedHeading - 90)));

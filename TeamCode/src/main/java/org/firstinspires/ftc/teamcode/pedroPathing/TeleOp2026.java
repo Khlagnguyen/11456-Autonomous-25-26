@@ -154,9 +154,12 @@ public class TeleOp2026 extends LinearOpMode {
                 velocityTarget = 1200;
                 useAutoVelocity = false; // Manual override disables auto
             }
-            if (gamepad2.y) {
+            if (gamepad2.b) {
                 velocityTarget = 1120;
                 useAutoVelocity = false; // Manual override disables auto
+            }
+            if (gamepad2.b) {
+                useAutoVelocity = false; // 'B' disables Auto Velocity
             }
             if (gamepad2.a) {
                 useAutoVelocity = true; // 'A' enables Auto Velocity
