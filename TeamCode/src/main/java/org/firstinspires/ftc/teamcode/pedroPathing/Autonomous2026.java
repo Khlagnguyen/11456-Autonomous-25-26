@@ -304,8 +304,12 @@ public class Autonomous2026 extends OpMode {
 
         pickup2Pose = new Pose(Math.abs(blueOrRedX - 120), 73, Math.toRadians(Math.abs(blueOrRedHeading - 0))); // Middle (Second Set) of Artifacts from the Spike Mark.
         pickup3Pose = new Pose(Math.abs(blueOrRedX - 120), 98, Math.toRadians(Math.abs(blueOrRedHeading - 0))); // Highest (First Set) of Artifacts from the Spike Mark.
-        finishPose = new Pose(Math.abs(blueOrRedX - 125), 17, Math.toRadians(Math.abs(blueOrRedHeading - 0)));
 
+        if (alliance) {
+            finishPose = new Pose(Math.abs(blueOrRedX - 125), 18, Math.toRadians(Math.abs(blueOrRedHeading - 0)));
+        } else {
+            finishPose = new Pose(Math.abs(blueOrRedX - 125), 17, Math.toRadians(Math.abs(blueOrRedHeading - 0)));
+        }
 
         follower = Constants.createFollower(hardwareMap);
         buildPaths();
