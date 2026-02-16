@@ -52,20 +52,22 @@ public class Autonomous2026 extends OpMode {
 
     public void buildPaths() {
         /* This is our scorePreload path. We are using a BezierLine, which is a straight line. */
-        scorePreload = new Path(new BezierLine(startPose, scorePose));
-        scorePreload.setLinearHeadingInterpolation(startPose.getHeading(), scorePose.getHeading());
+        if (alliance && leave) {
+            scorePreload = new Path(new BezierLine(startPose, pickup1Pose));
+            scorePreload.setLinearHeadingInterpolation(startPose.getHeading(), pickup1Pose.getHeading());
+        } else if (!alliance && !leave && !goAlliance) {
+            scorePreload = new Path(new BezierLine(startPose, new Pose(scorePose.getX() + 0.001, scorePose.getY() + 0.001, scorePose.getHeading())));
+            scorePreload.setLinearHeadingInterpolation(startPose.getHeading(), scorePose.getHeading());
+        } else {
+            scorePreload = new Path(new BezierLine(startPose, scorePose));
+            scorePreload.setLinearHeadingInterpolation(startPose.getHeading(), scorePose.getHeading());
+        }
+
         if (leave) {
-            if (alliance) {
-                grabPickup1 = follower.pathBuilder()
-                        .addPath(new BezierCurve(scorePose, new Pose(Math.abs(blueOrRedX - 72), 78, Math.toRadians(Math.abs(blueOrRedHeading - 90))), pickup1Pose))
-                        .setLinearHeadingInterpolation(scorePose.getHeading(), pickup1Pose.getHeading())
-                        .build();
-            } else {
-                grabPickup1 = follower.pathBuilder()
-                        .addPath(new BezierCurve(scorePose, new Pose(Math.abs(blueOrRedX - 72), 30, Math.toRadians(Math.abs(blueOrRedHeading - 90))), pickup1Pose))
-                        .setLinearHeadingInterpolation(scorePose.getHeading(), pickup1Pose.getHeading())
-                        .build();
-            }
+            grabPickup1 = follower.pathBuilder()
+                    .addPath(new BezierLine(scorePose, pickup1Pose))
+                    .setLinearHeadingInterpolation(scorePose.getHeading(), pickup1Pose.getHeading())
+                    .build();
         } else {
             grabPickup1 = follower.pathBuilder()
                     .addPath(new BezierCurve(scorePose, new Pose(Math.abs(blueOrRedX - 68), 38, Math.toRadians(Math.abs(blueOrRedHeading - 0))), pickup1Pose))
@@ -108,8 +110,8 @@ public class Autonomous2026 extends OpMode {
             ((DcMotorEx) LLaunch).setVelocity(1100 * power);
             ((DcMotorEx) RLaunch).setVelocity(-1100 * power);
         } else {
-            ((DcMotorEx) LLaunch).setVelocity(1200 * power);
-            ((DcMotorEx) RLaunch).setVelocity(-1200 * power);
+            ((DcMotorEx) LLaunch).setVelocity(1160 * power);
+            ((DcMotorEx) RLaunch).setVelocity(-1160 * power);
         }
         LFeed.setPower(-1 * power);
         RFeed.setPower(1 * power);
@@ -126,14 +128,25 @@ public class Autonomous2026 extends OpMode {
                 break;
             case 1:
                 if (alliance || goAlliance) {
-                    double startTime = goAlliance ? 2.5 : 1.5;
-                    if (pathTimer.getElapsedTimeSeconds() > startTime) {
-                        setPowers(1.0);
-                    }
-                    if (pathTimer.getElapsedTimeSeconds() > 8) {
-                        setPowers(0.0);
-                        follower.followPath(grabPickup1, true);
-                        setPathState(2);
+                    if (leave) {
+                        if (!follower.isBusy()) {
+                            if (alliance) {
+                                setPathState(2);
+                            } else {
+                                follower.followPath(grabPickup1, true);
+                                setPathState(2);
+                            }
+                        }
+                    } else {
+                        double startTime = goAlliance ? 2.5 : 1.5;
+                        if (pathTimer.getElapsedTimeSeconds() > startTime) {
+                            setPowers(1.0);
+                        }
+                        if (pathTimer.getElapsedTimeSeconds() > 8) {
+                            setPowers(0.0);
+                            follower.followPath(grabPickup1, true);
+                            setPathState(2);
+                        }
                     }
                 } else {
                     if (pathTimer.getElapsedTimeSeconds() > 6) {
@@ -284,9 +297,9 @@ public class Autonomous2026 extends OpMode {
         if (alliance || goAlliance) {
             if (alliance) {
                 if (blueOrRed.equals("blue")) {
-                    startPose = new Pose(23, 125, Math.toRadians(315));
+                    startPose = new Pose(23, 125, Math.toRadians(270 + 45));
                 } else {
-                    startPose = new Pose(121, 125, Math.toRadians(225));
+                    startPose = new Pose(121, 125, Math.toRadians(270 - 45));
                 }
             } else {
                 startPose = new Pose(Math.abs(blueOrRedX - 53), 9, Math.toRadians(Math.abs(blueOrRedHeading - 90)));
@@ -294,12 +307,16 @@ public class Autonomous2026 extends OpMode {
             scorePose = new Pose(Math.abs(blueOrRedX - 110), 101, Math.toRadians(Math.abs(blueOrRedHeading - 158))); // Scoring Pose of our robot. It is facing the goal at a 158 degree angle.
         } else {
             startPose = new Pose(Math.abs(blueOrRedX - 53), 9, Math.toRadians(Math.abs(blueOrRedHeading - 90)));
-            scorePose = new Pose(Math.abs(blueOrRedX - 89), 10, Math.toRadians(Math.abs(blueOrRedHeading - 120))); // Scoring Pose of our robot. It is facing the goal at a 135 degree angle.
+            scorePose = new Pose(Math.abs(blueOrRedX - 53), 12, Math.toRadians(Math.abs(blueOrRedHeading - 110))); // Scoring Pose of our robot. It is facing the goal at a 135 degree angle.
         }
         if (leave) {
-            pickup1Pose = new Pose(Math.abs(blueOrRedX - 72), 48, Math.toRadians(Math.abs(blueOrRedHeading - 90)));
+            if (alliance || goAlliance) {
+                pickup1Pose = new Pose(Math.abs(blueOrRedX - 25), 96, Math.toRadians(Math.abs(blueOrRedHeading - 270)));
+            } else {
+                pickup1Pose = new Pose(Math.abs(blueOrRedX - 53), 48, Math.toRadians(Math.abs(blueOrRedHeading - 90)));
+            }
         } else {
-            pickup1Pose = new Pose(Math.abs(blueOrRedX - 120), 48, Math.toRadians(Math.abs(blueOrRedHeading - 0))); // Lowest (Third Set) of Artifacts from the Spike Mark.
+            pickup1Pose = new Pose(Math.abs(blueOrRedX - 120), 48, Math.toRadians(Math.abs(blueOrRedHeading - 0)));
         }
 
         pickup2Pose = new Pose(Math.abs(blueOrRedX - 120), 73, Math.toRadians(Math.abs(blueOrRedHeading - 0))); // Middle (Second Set) of Artifacts from the Spike Mark.
