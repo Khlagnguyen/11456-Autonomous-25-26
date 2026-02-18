@@ -23,14 +23,7 @@ public class XavionTest extends OpMode {
     private CRServo RFeed;
     private DcMotor LLaunch;
     private DcMotor RLaunch;
-    private DcMotor BR;
-    private DcMotor FR;
-    private DcMotor FL;
-    private DcMotor BL;
-
     private int pathState;
-    private java.util.List<Pose> allPoses;
-
     private Pose startPose, endPose, turnPose;
 
     private Path movement;
@@ -92,6 +85,7 @@ public class XavionTest extends OpMode {
 
         /* This is our scorePreload path. We are using a BezierLine, which is a straight line. */
         movement = new Path(new BezierLine(startPose, endPose));
+        movement.setLinearHeadingInterpolation(startPose.getHeading(),endPose.getHeading());
         turnPath = follower.pathBuilder()
                 .addPath(new BezierCurve(endPose, new Pose(Math.abs(blueOrRedX-80), 40, Math.toRadians(Math.abs(blueOrRedHeading-0))), turnPose))
                 .setLinearHeadingInterpolation(endPose.getHeading(), turnPose.getHeading())
@@ -121,6 +115,7 @@ public class XavionTest extends OpMode {
                 break;
             case 1:
                 follower.followPath(turnPath);
+                setPathState(-1);
                 break;
 
         }
